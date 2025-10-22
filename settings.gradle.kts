@@ -9,6 +9,8 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven(url = "https://jitpack.io")
+        maven(url = "https://github.com/SceneView/sceneview-android/raw/main/maven")
     }
 }
 dependencyResolutionManagement {
@@ -16,6 +18,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://jitpack.io")
+        maven(url = "https://github.com/SceneView/sceneview-android/raw/main/maven")
+
     }
 }
 

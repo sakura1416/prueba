@@ -11,6 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Prueba">
+
+        <!-- 👇 Agrega esta línea justo aquí -->
+        <activity android:name=".ModelViewerActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -18,7 +22,6 @@
             android:theme="@style/Theme.Prueba">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

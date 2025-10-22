@@ -1,5 +1,6 @@
 package com.example.prueba
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -35,29 +36,25 @@ fun PruebaAppTheme(content: @Composable () -> Unit) {
 fun PantallaPrincipal() {
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
-    var showModelo by remember { mutableStateOf(false) }
 
     LaunchedEffect(isLoading) {
         if (isLoading) {
-            delay(1500)
+            delay(1500) // Simula una carga breve
             isLoading = false
-            showModelo = true
+
+            // Después de la carga, abrir el visor 3D real
+            val intent = Intent(context, ModelViewerActivity::class.java)
+            context.startActivity(intent)
         }
     }
 
-    if (showModelo) {
-        VistaModelo3D(
-            onBack = { showModelo = false }
-        )
-    } else {
-        MenuPrincipal(
-            isLoading = isLoading,
-            onCargarModelo = {
-                isLoading = true
-                verificarModelo3D(context)
-            }
-        )
-    }
+    MenuPrincipal(
+        isLoading = isLoading,
+        onCargarModelo = {
+            isLoading = true
+            verificarModelo3D(context)
+        }
+    )
 }
 
 @Composable
@@ -135,112 +132,11 @@ fun MenuPrincipal(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                InfoItem("Nombre", "Earth From Space")
-                InfoItem("Formato", "GLB (Blender)")
-                InfoItem("Ubicación", "assets/models/Earth_From_Space.glb")
+                InfoItem("Nombre", "Earth")
+                InfoItem("Formato", "GLB")
+                InfoItem("Ubicación", "assets/models/earth.glb")
             }
         }
-    }
-}
-
-@Composable
-fun VistaModelo3D(onBack: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "🌎 Earth From Space",
-            fontSize = 28.sp,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-
-        Surface(
-            modifier = Modifier
-                .size(180.dp)
-                .padding(16.dp),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = 16.dp
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "🌍",
-                        fontSize = 80.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Modelo 3D Activo",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Earth From Space",
-            fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Modelo 3D cargado exitosamente",
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Controles de navegación
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            OutlinedButton(onClick = { }) {
-                Text("Rotar")
-            }
-            OutlinedButton(onClick = { }) {
-                Text("Zoom")
-            }
-            OutlinedButton(onClick = { }) {
-                Text("Reset")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth(0.7f)
-        ) {
-            Text("Volver al Menú Principal")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Earth From Space - Modelo GLB funcionando",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.outline
-        )
     }
 }
 
@@ -270,14 +166,14 @@ fun InfoItem(etiqueta: String, valor: String) {
 private fun verificarModelo3D(context: android.content.Context) {
     try {
         val assetManager = context.assets
-        val inputStream = assetManager.open("models/Earth_From_Space.glb")
+        val inputStream = assetManager.open("models/earth.glb")
         val fileSize = inputStream.available()
         inputStream.close()
 
         Toast.makeText(
             context,
-            "✅ Earth From Space encontrado\nTamaño: ${fileSize / 1024} KB",
-            Toast.LENGTH_LONG
+            "✅ earth.glb encontrado\nTamaño: ${fileSize / 1024} KB",
+            Toast.LENGTH_SHORT
         ).show()
 
     } catch (e: Exception) {
