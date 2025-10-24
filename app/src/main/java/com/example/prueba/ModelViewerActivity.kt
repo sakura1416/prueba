@@ -15,6 +15,7 @@ import io.github.sceneview.Scene
 import io.github.sceneview.node.ModelNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberModelLoader
+import io.github.sceneview.rememberCameraNode
 
 class ModelViewerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,11 +36,12 @@ fun ModelViewerScreen() {
 
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
+    val cameraNode = rememberCameraNode(engine)
 
-    // Cargar el modelo en el hilo principal con LaunchedEffect
+    // Cargar el modelo
     LaunchedEffect(Unit) {
         try {
-            // Crear instancia del modelo (debe ser en el hilo principal)
+            // Crear instancia del modelo
             val instance = modelLoader.createModelInstance(
                 assetFileLocation = "models/earth.glb"
             )
@@ -47,12 +49,16 @@ fun ModelViewerScreen() {
             if (instance != null) {
                 modelNode = ModelNode(
                     modelInstance = instance,
-                    scaleToUnits = 1.5f,
+                    scaleToUnits = 2f,
                     centerOrigin = io.github.sceneview.math.Position(0f, 0f, 0f)
                 ).apply {
-                    // Posicionar el modelo frente a la cámara
-                    position = io.github.sceneview.math.Position(x = 0f, y = 0f, z = -4f)
+                    // Centrar el modelo en el origen
+                    position = io.github.sceneview.math.Position(x = 0f, y = 0f, z = 0f)
                 }
+
+                // Posicionar la cámara
+                cameraNode.position = io.github.sceneview.math.Position(x = 0f, y = 0f, z = 6f)
+                cameraNode.lookAt(io.github.sceneview.math.Position(0f, 0f, 0f))
             } else {
                 errorMessage = "No se pudo crear la instancia del modelo"
             }
@@ -65,13 +71,16 @@ fun ModelViewerScreen() {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Mostrar la escena 3D
+        // Mostrar la escena 3D con controles habilitados por defecto
         if (modelNode != null) {
             Scene(
                 modifier = Modifier.fillMaxSize(),
                 engine = engine,
                 modelLoader = modelLoader,
-                childNodes = listOf(modelNode!!)
+                cameraNode = cameraNode,
+                childNodes = listOf(modelNode!!),
+                // SceneView tiene controles táctiles automáticos
+                cameraManipulator = io.github.sceneview.rememberCameraManipulator()
             )
         }
 
@@ -123,6 +132,39 @@ fun ModelViewerScreen() {
                         color = Color.White,
                         style = MaterialTheme.typography.bodyLarge
                     )
+                }
+            }
+        }
+
+        // Instrucciones de uso
+        if (!isLoading && errorMessage == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "🌍 Controles",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "• Arrastra: Rotar\n• Pinch: Zoom",
+                            color = Color.White.copy(alpha = 0.9f),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
         }
